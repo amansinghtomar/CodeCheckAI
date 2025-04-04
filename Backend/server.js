@@ -14,6 +14,31 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
+const textPrompt = `
+As a Senior Full-Stack Developer with expertise across frontend, backend, and security:
+
+Please review the following code thoroughly. Your tasks are:
+
+1. Check for syntax errors, deprecated patterns, or outdated libraries.
+2. Suggest improvements in terms of performance, readability, structure, and best practices.
+3. Identify potential bugs that may arise during execution.
+4. Highlight any security vulnerabilities (e.g., XSS, injection risks, unsafe code patterns).
+5. If the code is clean, confirm that as well.
+
+📦 Respond strictly in the following **JSON format**:
+
+{
+  "updatedCode": "/* Provide the improved version of the code here */",
+  "improvements": ["List of suggestions for improving code quality and performance."],
+  "potentialBugs": ["List of any bugs or runtime issues that could occur."],
+  "securityRisks": ["List any security vulnerabilities found, or state 'None' if there are none."],
+  "syntaxErrors": [],
+  "deprecatedPatterns": [],
+  "outdatedLibraries": [],
+}
+Do not provide any backticks and all, simple JSON Object
+`;
+
 // Firebase setup
 // const serviceAccount = require("./firebase-key.json");
 // admin.initializeApp({
@@ -51,7 +76,7 @@ app.post("/review", upload.single("file"), async (req, res) => {
          if (unlinkErr) console.error("Error deleting temporary file:", unlinkErr);
       });
 
-      const prompt = `Review the following code and suggest improvements, identify potential bugs, and highlight areas for better readability and maintainability:\n\n${code}`;
+      const prompt = `${textPrompt}\n\n${code}`;
 
       console.log("Sending code review request to Gemini...");
 
@@ -73,10 +98,29 @@ app.post("/review", upload.single("file"), async (req, res) => {
          return res.status(500).json({ success: false, message: "No review result received from AI" });
       }
 
-      const reviewResult = response.candidates[0].content.parts[0].text;
-      console.log("Code review completed.", reviewResult);
+      const reviewText = response.candidates[0].content.parts[0].text;
+      console.log(reviewText, "raw Gemini response");
 
-      res.json({ success: true, review: reviewResult });
+      const jsonMatch = reviewText.match(/{[\s\S]*}/);
+      if (!jsonMatch) {
+         throw new Error("No valid JSON block found in Gemini response");
+      }
+
+      let jsonString = jsonMatch[0];
+
+      // Replace backtick-enclosed updatedCode with a properly escaped JSON string
+      jsonString = jsonString.replace(/"updatedCode":\s*`([\s\S]*?)`/, (_, codeBlock) => {
+         const escapedCode = codeBlock
+            .replace(/\\/g, "\\\\") // Escape backslashes
+            .replace(/"/g, '\\"') // Escape double quotes
+            .replace(/\n/g, "\\n"); // Escape newlines
+         return `"updatedCode": "${escapedCode}"`;
+      });
+
+      const parsedJSON = JSON.parse(jsonString);
+
+      console.log("Code review completed.", parsedJSON);
+      res.json({ success: true, review: parsedJSON });
    } catch (error) {
       console.error("Error reviewing code:", error);
       res.status(500).json({ success: false, message: "Internal server error during code review" });
