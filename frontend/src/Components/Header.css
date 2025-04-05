@@ -10,5 +10,18 @@
   position: fixed;
   top: 0;
   z-index: 1000;
-  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  justify-content: space-between;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid white;
+  background-color: white;
+}
+
+.settings-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
 }
