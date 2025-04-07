@@ -6,6 +6,12 @@ import ChatArea from "./pages/Dashboard/ChatArea";
 import Header from "./pages/Navbar/Header";
 import Login from "./pages/Authentication/Login";
 import SignUp from "./pages/Authentication/SignUp";
+import { useAuth } from "./context/AuthContext";
+
+const ProtectedRoute = ({ children }) => {
+   const { user } = useAuth();
+   return user ? children : <Navigate to="/login" />;
+};
 
 function App() {
    const [chats, setChats] = useState([]);
@@ -30,8 +36,12 @@ function App() {
                   path="/home"
                   element={
                      <div className="main-content">
-                        <Sidebar chats={chats} onChatSelect={() => {}} startNewChat={startNewChat} />
-                        <ChatArea key={currentChatKey} addChatToSidebar={addChatToSidebar} />
+                        <ProtectedRoute>
+                           <Sidebar chats={chats} onChatSelect={() => {}} startNewChat={startNewChat} />
+                        </ProtectedRoute>
+                        <ProtectedRoute>
+                           <ChatArea key={currentChatKey} addChatToSidebar={addChatToSidebar} />
+                        </ProtectedRoute>
                      </div>
                   }
                />

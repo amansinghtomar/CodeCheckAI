@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Select from "react-select";
 import "./SettingsModal.css";
+import { useAuthFunctions } from "../../hooks/useAuthFunctions";
+import { useNavigate } from "react-router-dom";
 
 const languageOptions = [
    { value: "javascript", label: "JavaScript" },
@@ -16,6 +18,20 @@ const languageOptions = [
 const SettingsModal = ({ cancelListener }) => {
    const [selectedLanguages, setSelectedLanguages] = useState([]);
    const [customCriteria, setCustomCriteria] = useState("");
+   const navigate = useNavigate();
+
+   const { logout } = useAuthFunctions();
+
+   const handleLogout = async () => {
+      try {
+         await logout();
+         navigate("/login");
+         cancelListener(false);
+      } catch (error) {
+         console.log(error);
+      }
+   };
+
    return (
       <>
          <div className="modal-overlay">
@@ -41,6 +57,8 @@ const SettingsModal = ({ cancelListener }) => {
                   onChange={(e) => setCustomCriteria(e.target.value)}
                   className="criteria-textarea"
                />
+
+               <button onClick={handleLogout}>Logout</button>
                <div className="modal-actions">
                   <button onClick={() => cancelListener(false)}>Close</button>
                   <button
