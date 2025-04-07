@@ -4,9 +4,9 @@ import axios from "axios";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { FileIcon, X } from "lucide-react";
-import TypingText from "./TypingText";
+import TypingText from "../../components/TypingText";
 
-const ChatArea = ({ }) => {
+const ChatArea = () => {
    const [messages, setMessages] = useState([]);
    const [message, setMessage] = useState("");
    const [chatTitle, setChatTitle] = useState("");
@@ -16,7 +16,6 @@ const ChatArea = ({ }) => {
    const [currentSection, setCurrentSection] = useState(0);
    const [showValue, setShowValue] = useState(false);
    const bottomRef = useRef(null);
-
 
    useEffect(() => {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,7 +28,7 @@ const ChatArea = ({ }) => {
       const formData = new FormData();
       if (file) formData.append("file", file);
       if (message.trim()) formData.append("text", message);
-      setMessages([...messages, { sender: "user", text: message || file.name, type: file.type || '' }]);
+      setMessages([...messages, { sender: "user", text: message || file.name, type: file.type || "" }]);
       setLoading(true);
       setError(null);
 
@@ -39,7 +38,7 @@ const ChatArea = ({ }) => {
          });
 
          const botResponse = response.data.review || "No response received.";
-         setMessages([...messages,{ sender: "user", text: message || file.name, type: file.type || '' }, { sender: "bot", text: botResponse }]);
+         setMessages([...messages, { sender: "user", text: message || file.name, type: file.type || "" }, { sender: "bot", text: botResponse }]);
          if (!chatTitle) {
             setChatTitle(message || file.name);
          }
@@ -83,15 +82,20 @@ const ChatArea = ({ }) => {
 
                return (
                   <div key={index} className={`message ${msg.sender}-message`}>
-                     {(msg.sender === 'user') ? (
-                        msg.type ?
+                     {msg.sender === "user" ? (
+                        msg.type ? (
                            <div className="userIcon-file-preview">
-                              <div className="userIcon file-icon"> <FileIcon /></div>
+                              <div className="userIcon file-icon">
+                                 {" "}
+                                 <FileIcon />
+                              </div>
                               <div className="file-info">
                                  <div className="userIcon file-name">{msg.text}</div>
                               </div>
                            </div>
-                           : <div>{msg.text}</div>
+                        ) : (
+                           <div>{msg.text}</div>
+                        )
                      ) : (
                         <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                            <div className="code-container">
@@ -130,8 +134,7 @@ const ChatArea = ({ }) => {
                                        {/* Already completed sections */}
                                        {index < currentSection && (
                                           <>
-                                             <span className="customfont">{section.label}</span>{" "}
-                                             <span>{section.data.join(", ")}</span>
+                                             <span className="customfont">{section.label}</span> <span>{section.data.join(", ")}</span>
                                           </>
                                        )}
                                     </p>
@@ -164,12 +167,17 @@ const ChatArea = ({ }) => {
             <div className="input-box-with-preview">
                {file && (
                   <div className="file-preview">
-                     <div className="file-icon"> <FileIcon /></div>
+                     <div className="file-icon">
+                        {" "}
+                        <FileIcon />
+                     </div>
                      <div className="file-info">
                         <div className="file-name">{file.name}</div>
                         <div className="file-type">{file.type?.split("/")[1]?.toUpperCase() || "FILE"}</div>
                      </div>
-                     <div className="file-remove" onClick={() => setFile(null)}><X /></div>
+                     <div className="file-remove" onClick={() => setFile(null)}>
+                        <X />
+                     </div>
                   </div>
                )}
                {!file && (
