@@ -27,7 +27,7 @@ const BotResponse = ({ textObj }) => {
    const [showValue, setShowValue] = useState(false);
 
    return (
-      <div className="bot-response">
+      <div className="bot-response" style={{ width: "100%" }}>
          <SyntaxHighlighter language="javascript" style={darcula}>
             {updatedCode}
          </SyntaxHighlighter>

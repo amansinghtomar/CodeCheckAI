@@ -32,7 +32,7 @@ const ChatArea = () => {
       setError(null);
 
       try {
-         const { data } = await axios.post("http://localhost:3001/review", formData);
+         const { data } = await axios.post(import.meta.env.VITE_API_URL, formData);
          const botResponse = { sender: "bot", text: data.review || "No response received." };
          setMessages((prev) => [...prev, botResponse]);
          if (!chatTitle) setChatTitle(message || file.name);
