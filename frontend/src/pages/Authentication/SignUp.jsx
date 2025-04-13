@@ -14,7 +14,7 @@ const SignUp = () => {
       e.preventDefault();
       try {
          await signup(username, password);
-         navigate("/home");
+         navigate("/");
       } catch (error) {
          console.log(error);
       }
@@ -23,7 +23,7 @@ const SignUp = () => {
    const handleGoogleSignIn = async () => {
       try {
          await loginWithGoogle();
-         navigate("/home");
+         navigate("/");
       } catch (error) {
          console.log(error);
       }
