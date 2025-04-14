@@ -25,19 +25,23 @@ const ChatArea = () => {
       const formData = new FormData();
       if (file) formData.append("file", file);
       if (message.trim()) formData.append("text", message);
-
+      const customCriteria = JSON.parse(localStorage.getItem("criteria"));
+      if (Object.keys(customCriteria).length > 0) formData.append("criteria", JSON.stringify(customCriteria));
       const userMessage = { sender: "user", text: message || file.name, type: file?.type || "" };
       setMessages((prev) => [...prev, userMessage]);
       setLoading(true);
       setError(null);
 
       try {
+         console.log(formData);
+
          const { data } = await axios.post(import.meta.env.VITE_API_URL, formData);
          const botResponse = { sender: "bot", text: data.review || "No response received." };
          setMessages((prev) => [...prev, botResponse]);
          if (!chatTitle) setChatTitle(message || file.name);
       } catch (err) {
          setError("Error processing request. Please try again.", err);
+         console.log(err);
       } finally {
          setLoading(false);
          setMessage("");

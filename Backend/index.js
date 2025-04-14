@@ -58,7 +58,7 @@ app.post("/review", upload.single("file"), async (req, res) => {
       if (!req.file) {
          return res.status(400).json({ success: false, message: "No file uploaded" });
       }
-      console.log("File received for review");
+      console.log("File received for review", req.body.criteria);
 
       const filePath = req.file.path;
       let code;
@@ -76,7 +76,17 @@ app.post("/review", upload.single("file"), async (req, res) => {
          if (unlinkErr) console.error("Error deleting temporary file:", unlinkErr);
       });
 
-      const prompt = `${textPrompt}\n\n${code}`;
+      const customCriteria = JSON.parse(req.body.criteria);
+      console.log(customCriteria);
+
+      const customCriteriaPrompt = `
+         Below is the my criteria to review the code make this into Consideration as well
+         Code Language is ${customCriteria.language} and below are my criterias
+         ${customCriteria.criteria}
+      `;
+      console.log(customCriteriaPrompt);
+
+      const prompt = `${textPrompt}\n\n ${customCriteriaPrompt} \n\n ${code}`;
 
       console.log("Sending code review request to Gemini...");
 

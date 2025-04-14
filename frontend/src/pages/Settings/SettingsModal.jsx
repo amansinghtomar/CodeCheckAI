@@ -16,8 +16,9 @@ const languageOptions = [
 ];
 
 const SettingsModal = ({ cancelListener }) => {
-   const [selectedLanguages, setSelectedLanguages] = useState([]);
-   const [customCriteria, setCustomCriteria] = useState("");
+   const criteria = JSON.parse(localStorage.getItem("settingsCriteria"));
+   const [selectedLanguages, setSelectedLanguages] = useState(criteria?.language || []);
+   const [customCriteria, setCustomCriteria] = useState(criteria?.criteria || []);
    const navigate = useNavigate();
 
    const { logout } = useAuthFunctions();
@@ -63,6 +64,20 @@ const SettingsModal = ({ cancelListener }) => {
                   <button onClick={() => cancelListener(false)}>Close</button>
                   <button
                      onClick={() => {
+                        localStorage.setItem(
+                           "criteria",
+                           JSON.stringify({
+                              language: selectedLanguages[0].label,
+                              criteria: customCriteria,
+                           }),
+                           localStorage.setItem(
+                              "settingsCriteria",
+                              JSON.stringify({
+                                 language: selectedLanguages,
+                                 criteria: customCriteria,
+                              })
+                           )
+                        );
                         cancelListener(false);
                      }}
                   >
