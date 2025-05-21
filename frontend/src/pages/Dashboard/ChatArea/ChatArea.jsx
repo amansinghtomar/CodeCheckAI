@@ -34,10 +34,14 @@ const ChatArea = () => {
 
       try {
          console.log(formData);
+         if (message) {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/review-pr`, { prUrl: message });
+         } else {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/review`, formData);
+            const botResponse = { sender: "bot", text: data.review || "No response received." };
+            setMessages((prev) => [...prev, botResponse]);
+         }
 
-         const { data } = await axios.post(import.meta.env.VITE_API_URL, formData);
-         const botResponse = { sender: "bot", text: data.review || "No response received." };
-         setMessages((prev) => [...prev, botResponse]);
          if (!chatTitle) setChatTitle(message || file.name);
       } catch (err) {
          setError("Error processing request. Please try again.", err);
